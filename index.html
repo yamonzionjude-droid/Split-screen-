@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Split Screen</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #111;
+    }
+
+    /* --- Welcome Animation Screen --- */
+    #welcome-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
+    }
+
+    .title {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #00fff5;
+      text-shadow: 0 0 15px rgba(0, 255, 245, 0.6);
+      animation: pulse 2s infinite alternate;
+      margin-bottom: 30px;
+    }
+
+    .start-btn {
+      padding: 14px 40px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #fff;
+      background: #e94560;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .start-btn:hover {
+      transform: scale(1.05);
+      background: #ff527b;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.9; }
+      100% { transform: scale(1.08); opacity: 1; }
+    }
+
+    /* --- Split Screen Layout --- */
+    #main-app {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      visibility: hidden;
+    }
+
+    .screen-partition {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Top Half: Utility App */
+    #top-app {
+      background-color: #0f3460;
+      color: #ffffff;
+      border-bottom: 3px solid #00fff5;
+    }
+
+    /* Bottom Half: Game App */
+    #bottom-game {
+      background-color: #1a1a1a;
+      color: #ffffff;
+    }
+
+    .screen-label {
+      position: absolute;
+      top: 10px;
+      left: 15px;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
+
+    /* Simple Mini-Game Elements */
+    .game-target {
+      width: 60px;
+      height: 60px;
+      background-color: #ff2e63;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      font-weight: bold;
+      box-shadow: 0 0 10px rgba(255, 46, 99, 0.8);
+      transition: transform 0.1s;
+    }
+
+    .game-target:active {
+      transform: scale(0.9);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. Welcome Screen -->
+  <div id="welcome-screen">
+    <div class="title">Split Screen</div>
+    <button class="start-btn" onclick="startApp()">START</button>
+  </div>
+
+  <!-- 2. Main Dual App Screen -->
+  <div id="main-app">
+    <!-- Top Half: Standard App -->
+    <div id="top-app" class="screen-partition">
+      <span class="screen-label">App Window</span>
+      <h2>Notes & Tasks</h2>
+      <p style="margin-top: 10px; opacity: 0.8;">Top partition active.</p>
+    </div>
+
+    <!-- Bottom Half: Game App -->
+    <div id="bottom-game" class="screen-partition">
+      <span class="screen-label">Game Window</span>
+      <h3 id="score-board" style="margin-bottom: 15px;">Score: 0</h3>
+      <div class="game-target" id="target" onclick="hitTarget()">TAP!</div>
+    </div>
+  </div>
+
+  <script>
+    let score = 0;
+
+    function startApp() {
+      const welcome = document.getElementById('welcome-screen');
+      const mainApp = document.getElementById('main-app');
+
+      // Animate out the welcome screen
+      welcome.style.transform = 'translateY(-100%)';
+      welcome.style.opacity = '0';
+
+      // Reveal split screens
+      setTimeout(() => {
+        welcome.style.display = 'none';
+        mainApp.style.visibility = 'visible';
+      }, 800);
+    }
+
+    function hitTarget() {
+      score++;
+      document.getElementById('score-board').innerText = 'Score: ' + score;
+
+      // Move the tap target to a random spot inside the bottom partition
+      const target = document.getElementById('target');
+      const container = document.getElementById('bottom-game');
+
+      const maxX = container.clientWidth - 80;
+      const maxY = container.clientHeight - 80;
+
+      const randomX = Math.max(20, Math.floor(Math.random() * maxX));
+      const randomY = Math.max(40, Math.floor(Math.random() * maxY));
+
+      target.style.position = 'absolute';
+      target.style.left = randomX + 'px';
+      target.style.top = randomY + 'px';
+    }
+  </script>
+</body>
+</html>
